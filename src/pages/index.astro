@@ -1,49 +1,318 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+const allPosts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const featuredMain = allPosts[0];
+const featuredSidebar = allPosts.slice(1, 4);
+const recentCards = allPosts.slice(4, 7);
+
+const categoryColors: Record<string, string> = {
+  'Capital Spending': '#4A8FD4',
+  'Business Models': '#9B85FF',
+  'Winners & Losers': '#F5A623',
+  'Supply Chain': '#4CB87A',
+  'Productivity Economy': '#E8893E',
+};
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        background: #0A0F1E;
+        color: #F0EDE6;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .ticker-bar {
+        background: #F5A623;
+        color: #0A0F1E;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 7px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        letter-spacing: 0.02em;
+      }
+      .ticker-track { display: inline-block; animation: ticker 40s linear infinite; }
+      @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+      .ticker-sep { margin: 0 28px; opacity: 0.4; }
+
+      nav {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 40px; border-bottom: 1px solid rgba(240,237,230,0.08);
+        position: sticky; top: 0; background: #0A0F1E; z-index: 100;
+      }
+      .nav-logo { display: flex; flex-direction: column; text-decoration: none; }
+      .nav-logo-main { font-family: 'DM Serif Display', serif; font-size: 18px; color: #F0EDE6; line-height: 1; }
+      .nav-logo-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #F5A623; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 3px; }
+      .nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+      .nav-links a { color: rgba(240,237,230,0.5); text-decoration: none; font-size: 13px; font-weight: 500; }
+      .nav-links a:hover, .nav-links a.active { color: #F0EDE6; }
+      .nav-links a.active { color: #F5A623; }
+      .nav-subscribe { background: #F5A623; color: #0A0F1E; border: none; padding: 9px 20px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 3px; }
+      .nav-mobile-toggle { display: none; background: none; border: none; color: #F0EDE6; font-size: 22px; cursor: pointer; }
+
+      .hero { padding: 80px 40px 60px; max-width: 1100px; margin: 0 auto; }
+      .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #F5A623; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 22px; }
+      .hero-headline { font-family: 'DM Serif Display', serif; font-size: clamp(36px, 5.5vw, 62px); line-height: 1.06; letter-spacing: -0.02em; color: #F0EDE6; max-width: 800px; margin-bottom: 24px; }
+      .hero-headline em { font-style: italic; color: #F5A623; }
+      .hero-sub { font-size: 17px; color: rgba(240,237,230,0.58); line-height: 1.68; max-width: 560px; margin-bottom: 42px; }
+      .hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+      .btn-primary { background: #F5A623; color: #0A0F1E; border: none; padding: 14px 28px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 3px; text-decoration: none; display: inline-block; }
+      .btn-ghost { background: transparent; color: rgba(240,237,230,0.65); border: 1px solid rgba(240,237,230,0.18); padding: 13px 24px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 3px; text-decoration: none; display: inline-block; }
+
+      .stats-strip { border-top: 1px solid rgba(240,237,230,0.08); border-bottom: 1px solid rgba(240,237,230,0.08); padding: 24px 40px; display: flex; max-width: 1100px; margin: 0 auto 72px; }
+      .stat-item { flex: 1; padding: 0 32px; border-right: 1px solid rgba(240,237,230,0.08); }
+      .stat-item:first-child { padding-left: 0; }
+      .stat-item:last-child { border-right: none; }
+      .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 500; color: #F5A623; line-height: 1; margin-bottom: 6px; }
+      .stat-label { font-size: 12px; color: rgba(240,237,230,0.4); line-height: 1.4; }
+
+      .section-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,237,230,0.3); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 24px; padding: 0 40px; max-width: 1100px; margin-left: auto; margin-right: auto; display: flex; align-items: center; gap: 14px; }
+      .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(240,237,230,0.07); }
+
+      .article-category { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px; font-weight: 500; }
+      .article-title { font-family: 'DM Serif Display', serif; color: #F0EDE6; line-height: 1.2; letter-spacing: -0.015em; margin-bottom: 12px; text-decoration: none; display: block; }
+      .article-title.lg { font-size: 30px; }
+      .article-title.md { font-size: 20px; }
+      .article-title.sm { font-size: 16px; }
+      .article-excerpt { font-size: 14px; color: rgba(240,237,230,0.52); line-height: 1.68; margin-bottom: 20px; }
+      .article-meta { display: flex; align-items: center; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,237,230,0.28); letter-spacing: 0.06em; }
+      .article-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(240,237,230,0.18); flex-shrink: 0; }
+
+      .featured-grid { padding: 0 40px; max-width: 1100px; margin: 0 auto 72px; display: grid; grid-template-columns: 1.65fr 1fr; gap: 1px; background: rgba(240,237,230,0.07); border: 1px solid rgba(240,237,230,0.07); }
+      .feat-main { background: #0A0F1E; padding: 40px; text-decoration: none; color: inherit; display: block; }
+      .feat-sidebar { display: flex; flex-direction: column; gap: 1px; background: rgba(240,237,230,0.07); }
+      .feat-sidebar-item { background: #0A0F1E; padding: 28px; text-decoration: none; color: inherit; display: block; border-left: 2px solid transparent; }
+      .feat-sidebar-item:hover { background: #0f1629; }
+
+      .card-grid { padding: 0 40px; max-width: 1100px; margin: 0 auto 72px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(240,237,230,0.07); border: 1px solid rgba(240,237,230,0.07); }
+      .card { background: #0A0F1E; padding: 30px; text-decoration: none; color: inherit; display: block; }
+      .card:hover { background: #0f1629; }
+
+      .coverage-section { padding: 0 40px 72px; max-width: 1100px; margin: 0 auto; }
+      .coverage-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+      .coverage-item { border: 1px solid rgba(240,237,230,0.09); padding: 22px 18px; border-radius: 2px; text-decoration: none; color: inherit; display: block; }
+      .coverage-item:hover { border-color: rgba(245,166,35,0.35); background: rgba(245,166,35,0.04); }
+      .coverage-icon { font-size: 22px; font-weight: 500; margin-bottom: 14px; line-height: 1; font-family: 'JetBrains Mono', monospace; }
+      .coverage-name { font-size: 13px; font-weight: 600; color: #F0EDE6; margin-bottom: 7px; }
+      .coverage-desc { font-size: 11.5px; color: rgba(240,237,230,0.38); line-height: 1.55; }
+
+      .about-strip { border-top: 1px solid rgba(240,237,230,0.07); border-bottom: 1px solid rgba(240,237,230,0.07); padding: 48px 40px; margin: 0 auto 72px; max-width: 1100px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 56px; align-items: center; }
+      .about-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,237,230,0.3); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 14px; }
+      .about-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: #F0EDE6; line-height: 1.2; }
+      .about-title em { font-style: italic; color: #F5A623; }
+      .about-body { font-size: 14px; color: rgba(240,237,230,0.52); line-height: 1.72; }
+      .about-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+      .pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: rgba(240,237,230,0.5); border: 1px solid rgba(240,237,230,0.12); padding: 5px 12px; border-radius: 20px; }
+
+      .email-section { margin: 0 auto 72px; max-width: 1020px; background: #111827; border: 1px solid rgba(240,237,230,0.07); padding: 52px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: center; }
+      .email-headline { font-family: 'DM Serif Display', serif; font-size: 34px; color: #F0EDE6; line-height: 1.18; margin-bottom: 12px; }
+      .email-headline em { font-style: italic; color: #F5A623; }
+      .email-tagline { font-size: 14px; color: rgba(240,237,230,0.48); line-height: 1.65; }
+      .email-form { display: flex; flex-direction: column; gap: 10px; }
+      .email-input { background: rgba(240,237,230,0.06); border: 1px solid rgba(240,237,230,0.14); color: #F0EDE6; padding: 14px 16px; font-size: 14px; border-radius: 3px; outline: none; }
+      .email-input::placeholder { color: rgba(240,237,230,0.28); }
+      .email-btn { background: #F5A623; color: #0A0F1E; border: none; padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 3px; }
+      .email-note { font-size: 11px; color: rgba(240,237,230,0.22); font-family: 'JetBrains Mono', monospace; }
+
+      footer.site-footer { border-top: 1px solid rgba(240,237,230,0.07); padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
+      .footer-logo { font-family: 'DM Serif Display', serif; font-size: 15px; color: rgba(240,237,230,0.45); }
+      .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,237,230,0.18); }
+      .footer-links { display: flex; gap: 22px; }
+      .footer-links a { font-size: 12px; color: rgba(240,237,230,0.28); text-decoration: none; }
+      .footer-links a:hover { color: rgba(240,237,230,0.65); }
+
+      @media (max-width: 900px) {
+        nav { padding: 16px 20px; }
+        .nav-links, .nav-subscribe { display: none; }
+        .nav-mobile-toggle { display: block; }
+        .hero { padding: 48px 20px 40px; }
+        .stats-strip { padding: 20px; overflow-x: auto; }
+        .stat-item { padding: 0 20px; min-width: 130px; }
+        .section-label { padding: 0 20px; }
+        .featured-grid { grid-template-columns: 1fr; padding: 0 20px; }
+        .card-grid { grid-template-columns: 1fr; padding: 0 20px; }
+        .coverage-grid { grid-template-columns: repeat(2, 1fr); }
+        .coverage-section { padding: 0 20px 48px; }
+        .about-strip { grid-template-columns: 1fr; gap: 24px; padding: 36px 20px; }
+        .email-section { grid-template-columns: 1fr; padding: 36px 24px; gap: 28px; margin: 0 20px 48px; }
+        footer.site-footer { flex-direction: column; gap: 16px; text-align: center; padding: 28px 20px; }
+      }
+      @media (max-width: 520px) {
+        .coverage-grid { grid-template-columns: 1fr; }
+        .hero-headline { font-size: 34px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ticker-bar" role="marquee" aria-label="AI capital flow data">
+      <span class="ticker-track">
+        MSFT CAPEX FY2025: $80.0B<span class="ticker-sep">|</span>GOOGL CAPEX FY2025: $75.0B<span class="ticker-sep">|</span>META CAPEX FY2025: $65.0B<span class="ticker-sep">|</span>AMZN AI INFRA: $105.0B<span class="ticker-sep">|</span>NVDA DATA CENTER REV: $47.5B/QTR<span class="ticker-sep">|</span>OPENAI ARR: $4.0B<span class="ticker-sep">|</span>GLOBAL AI INFRA SPEND 2025: $350B+<span class="ticker-sep">|</span>MSFT CAPEX FY2025: $80.0B<span class="ticker-sep">|</span>GOOGL CAPEX FY2025: $75.0B<span class="ticker-sep">|</span>META CAPEX FY2025: $65.0B
+      </span>
+    </div>
+
+    <nav>
+      <a class="nav-logo" href="/">
+        <span class="nav-logo-main">The Economics of AI</span>
+        <span class="nav-logo-sub">Follow the money</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="active">Analysis</a></li>
+        <li><a href="/blog">Archive</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+      <a class="nav-subscribe" href="#subscribe">Subscribe Free</a>
+      <button class="nav-mobile-toggle" aria-label="Open menu">☰</button>
+    </nav>
+
+    <section class="hero">
+      <p class="hero-eyebrow">Independent long-form analysis · Est. 2025</p>
+      <h1 class="hero-headline">The AI boom is real.<br /><em>The profits</em> are not<br />evenly distributed.</h1>
+      <p class="hero-sub">Deep analysis of capital flows, business models, and structural dynamics that determine who actually wins in the AI revolution — grounded in earnings data, not hype.</p>
+      <div class="hero-actions">
+        {featuredMain && <a class="btn-primary" href={`/blog/${featuredMain.id}/`}>Read Latest Analysis</a>}
+        <a class="btn-ghost" href="/blog">Browse All Topics</a>
+      </div>
+    </section>
+
+    <div class="stats-strip">
+      <div class="stat-item"><div class="stat-num">$350B+</div><div class="stat-label">Hyperscaler AI capex, 2025</div></div>
+      <div class="stat-item"><div class="stat-num">~$0</div><div class="stat-label">OpenAI net income, 2024</div></div>
+      <div class="stat-item"><div class="stat-num">89%</div><div class="stat-label">NVDA data center gross margin</div></div>
+      <div class="stat-item"><div class="stat-num">4,200+</div><div class="stat-label">AI startups funded since 2023</div></div>
+    </div>
+
+    {allPosts.length > 0 && (
+      <>
+        <p class="section-label">Latest analysis</p>
+        <div class="featured-grid">
+          {featuredMain && (
+            <a class="feat-main" href={`/blog/${featuredMain.id}/`}>
+              <p class="article-category" style={`color:${categoryColors[featuredMain.data.category]}`}>{featuredMain.data.category}</p>
+              <h2 class="article-title lg">{featuredMain.data.title}</h2>
+              <p class="article-excerpt">{featuredMain.data.description}</p>
+              <div class="article-meta">
+                <span>{featuredMain.data.pubDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+              </div>
+            </a>
+          )}
+          <div class="feat-sidebar">
+            {featuredSidebar.map((post) => (
+              <a class="feat-sidebar-item" href={`/blog/${post.id}/`}>
+                <p class="article-category" style={`color:${categoryColors[post.data.category]}`}>{post.data.category}</p>
+                <h3 class="article-title sm">{post.data.title}</h3>
+                <div class="article-meta" style="margin-top:10px;">
+                  <span>{post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </>
+    )}
+
+    {recentCards.length > 0 && (
+      <>
+        <p class="section-label">Recent essays</p>
+        <div class="card-grid">
+          {recentCards.map((post) => (
+            <a class="card" href={`/blog/${post.id}/`}>
+              <p class="article-category" style={`color:${categoryColors[post.data.category]}`}>{post.data.category}</p>
+              <h3 class="article-title md">{post.data.title}</h3>
+              <p class="article-excerpt" style="margin-top:10px;">{post.data.description}</p>
+              <div class="article-meta" style="margin-top:16px;">
+                <span>{post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </>
+    )}
+
+    <p class="section-label">Five coverage areas</p>
+    <section class="coverage-section">
+      <div class="coverage-grid">
+        <a class="coverage-item" href="/blog" style="text-decoration:none;">
+          <div class="coverage-icon" style="color:#4A8FD4;">$</div>
+          <div class="coverage-name">AI Capex</div>
+          <div class="coverage-desc">Where hyperscalers deploy hundreds of billions and what it means economically</div>
+        </a>
+        <a class="coverage-item" href="/blog" style="text-decoration:none;">
+          <div class="coverage-icon" style="color:#9B85FF;">◈</div>
+          <div class="coverage-name">Business Models</div>
+          <div class="coverage-desc">Revenue mechanics, margin structure, and why well-funded startups still go bankrupt</div>
+        </a>
+        <a class="coverage-item" href="/blog" style="text-decoration:none;">
+          <div class="coverage-icon" style="color:#F5A623;">⬆</div>
+          <div class="coverage-name">Winners &amp; Losers</div>
+          <div class="coverage-desc">Durable competitive advantages as model costs collapse and performance converges</div>
+        </a>
+        <a class="coverage-item" href="/blog" style="text-decoration:none;">
+          <div class="coverage-icon" style="color:#4CB87A;">⬡</div>
+          <div class="coverage-name">Supply Chain</div>
+          <div class="coverage-desc">Chips, cooling systems, power infrastructure, networking, and data center REITs</div>
+        </a>
+        <a class="coverage-item" href="/blog" style="text-decoration:none;">
+          <div class="coverage-icon" style="color:#E8893E;">∿</div>
+          <div class="coverage-name">Productivity</div>
+          <div class="coverage-desc">How AI efficiency gains show up in GDP data, corporate earnings, and labor markets</div>
+        </a>
+      </div>
+    </section>
+
+    <div class="about-strip">
+      <div>
+        <div class="about-label">What this is</div>
+        <h2 class="about-title">Not news.<br />Not hype.<br /><em>Analysis.</em></h2>
+      </div>
+      <div>
+        <p class="about-body">Most AI content focuses on model capabilities, product launches, and what happened last week. This blog goes one level deeper — into the business economics, capital flows, and structural shifts that actually determine who wins and who loses.</p>
+        <div class="about-pills">
+          <span class="pill">Earnings-grounded</span>
+          <span class="pill">No stock tips</span>
+          <span class="pill">No affiliate links</span>
+          <span class="pill">Independent</span>
+          <span class="pill">Long-form</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="email-section" id="subscribe">
+      <div>
+        <h2 class="email-headline">Analysis, not<br /><em>announcements.</em></h2>
+        <p class="email-tagline">One long-form piece per week. No news summaries, no hype, no affiliate links. Just the financial and strategic reality of AI.</p>
+      </div>
+      <div class="email-form">
+        <input class="email-input" type="email" placeholder="your@email.com" aria-label="Email address" />
+        <button class="email-btn">Get Weekly Analysis →</button>
+        <span class="email-note">Free · No spam · Unsubscribe anytime</span>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-logo">The Economics of AI</div>
+      <div class="footer-links">
+        <a href="/blog">Archive</a>
+        <a href="/about">About</a>
+        <a href="/rss.xml">RSS</a>
+      </div>
+      <div class="footer-copy">Independent analysis · Est. 2025</div>
+    </footer>
+  </body>
 </html>
