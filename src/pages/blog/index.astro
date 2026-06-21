@@ -1,114 +1,117 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 
 const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+const categoryColors: Record<string, string> = {
+  'Capital Spending': '#4A8FD4',
+  'Business Models': '#9B85FF',
+  'Winners & Losers': '#F5A623',
+  'Supply Chain': '#4CB87A',
+  'Productivity Economy': '#E8893E',
+};
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={`Archive — ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        background: #0A0F1E;
+        color: #F0EDE6;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+      nav {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 40px; border-bottom: 1px solid rgba(240,237,230,0.08);
+        position: sticky; top: 0; background: #0A0F1E; z-index: 100;
+      }
+      .nav-logo { display: flex; flex-direction: column; text-decoration: none; }
+      .nav-logo-main { font-family: 'DM Serif Display', serif; font-size: 18px; color: #F0EDE6; line-height: 1; }
+      .nav-logo-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #F5A623; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 3px; }
+      .nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+      .nav-links a { color: rgba(240,237,230,0.5); text-decoration: none; font-size: 13px; font-weight: 500; }
+      .nav-links a:hover, .nav-links a.active { color: #F0EDE6; }
+      .nav-links a.active { color: #F5A623; }
+      .nav-subscribe { background: #F5A623; color: #0A0F1E; border: none; padding: 9px 20px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 3px; text-decoration: none; }
+
+      .archive-header { max-width: 1100px; margin: 0 auto; padding: 64px 40px 8px; }
+      .archive-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #F5A623; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 18px; }
+      .archive-title { font-family: 'DM Serif Display', serif; font-size: clamp(32px, 5vw, 48px); line-height: 1.1; letter-spacing: -0.02em; color: #F0EDE6; margin-bottom: 48px; }
+
+      .archive-list { max-width: 1100px; margin: 0 auto; padding: 0 40px 100px; display: flex; flex-direction: column; }
+      .archive-item { display: block; text-decoration: none; color: inherit; padding: 32px 0; border-bottom: 1px solid rgba(240,237,230,0.08); }
+      .archive-item:hover .archive-item-title { color: #F5A623; }
+      .archive-category { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+      .archive-item-title { font-family: 'DM Serif Display', serif; font-size: 24px; line-height: 1.25; color: #F0EDE6; margin-bottom: 10px; transition: color 0.15s; }
+      .archive-item-desc { font-size: 14px; color: rgba(240,237,230,0.5); line-height: 1.6; margin-bottom: 14px; max-width: 640px; }
+      .archive-item-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(240,237,230,0.3); letter-spacing: 0.04em; }
+
+      footer.site-footer { border-top: 1px solid rgba(240,237,230,0.07); padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
+      .footer-logo { font-family: 'DM Serif Display', serif; font-size: 15px; color: rgba(240,237,230,0.45); }
+      .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,237,230,0.18); }
+      .footer-links { display: flex; gap: 22px; }
+      .footer-links a { font-size: 12px; color: rgba(240,237,230,0.28); text-decoration: none; }
+      .footer-links a:hover { color: rgba(240,237,230,0.65); }
+
+      @media (max-width: 700px) {
+        nav { padding: 16px 20px; }
+        .nav-links { display: none; }
+        .archive-header { padding: 40px 20px 8px; }
+        .archive-list { padding: 0 20px 60px; }
+        footer.site-footer { flex-direction: column; gap: 16px; text-align: center; padding: 28px 20px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="nav-logo" href="/">
+        <span class="nav-logo-main">The Economics of AI</span>
+        <span class="nav-logo-sub">Follow the money</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Analysis</a></li>
+        <li><a href="/blog" class="active">Archive</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+      <a class="nav-subscribe" href="/#subscribe">Subscribe Free</a>
+    </nav>
+
+    <div class="archive-header">
+      <p class="archive-eyebrow">All essays · {posts.length} published</p>
+      <h1 class="archive-title">The Archive</h1>
+    </div>
+
+    <div class="archive-list">
+      {posts.map((post) => (
+        <a class="archive-item" href={`/blog/${post.id}/`}>
+          <p class="archive-category" style={`color:${categoryColors[post.data.category] ?? '#F5A623'}`}>{post.data.category}</p>
+          <h2 class="archive-item-title">{post.data.title}</h2>
+          <p class="archive-item-desc">{post.data.description}</p>
+          <p class="archive-item-date">{post.data.pubDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        </a>
+      ))}
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-logo">The Economics of AI</div>
+      <div class="footer-links">
+        <a href="/blog">Archive</a>
+        <a href="/about">About</a>
+        <a href="/rss.xml">RSS</a>
+      </div>
+      <div class="footer-copy">Independent analysis · Est. 2025</div>
+    </footer>
+  </body>
 </html>
