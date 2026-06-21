@@ -1,63 +1,153 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
-import Layout from '../layouts/BlogPost.astro';
+import BaseHead from '../components/BaseHead.astro';
+import { SITE_TITLE } from '../consts';
 ---
 
-<Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
->
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`About — ${SITE_TITLE}`} description="What The Economics of AI is, and what it isn't." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        background: #0A0F1E;
+        color: #F0EDE6;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+      nav {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 40px; border-bottom: 1px solid rgba(240,237,230,0.08);
+        position: sticky; top: 0; background: #0A0F1E; z-index: 100;
+      }
+      .nav-logo { display: flex; flex-direction: column; text-decoration: none; }
+      .nav-logo-main { font-family: 'DM Serif Display', serif; font-size: 18px; color: #F0EDE6; line-height: 1; }
+      .nav-logo-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #F5A623; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 3px; }
+      .nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+      .nav-links a { color: rgba(240,237,230,0.5); text-decoration: none; font-size: 13px; font-weight: 500; }
+      .nav-links a:hover, .nav-links a.active { color: #F0EDE6; }
+      .nav-links a.active { color: #F5A623; }
+      .nav-subscribe { background: #F5A623; color: #0A0F1E; border: none; padding: 9px 20px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 3px; text-decoration: none; }
 
-	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
-	</p>
+      .about-wrap { max-width: 720px; margin: 0 auto; padding: 80px 40px 100px; }
+      .about-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #F5A623; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 22px; }
+      .about-headline { font-family: 'DM Serif Display', serif; font-size: clamp(32px, 5vw, 50px); line-height: 1.12; letter-spacing: -0.02em; color: #F0EDE6; margin-bottom: 36px; }
+      .about-headline em { font-style: italic; color: #F5A623; }
+      .about-text { font-size: 17px; line-height: 1.8; color: rgba(240,237,230,0.7); margin-bottom: 24px; }
+      .about-text strong { color: #F0EDE6; }
 
-	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
-	</p>
+      .pillars { margin: 48px 0; display: flex; flex-direction: column; gap: 1px; background: rgba(240,237,230,0.07); border: 1px solid rgba(240,237,230,0.07); }
+      .pillar { background: #0A0F1E; padding: 22px 26px; display: flex; align-items: baseline; gap: 18px; }
+      .pillar-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(240,237,230,0.28); flex-shrink: 0; width: 24px; }
+      .pillar-name { font-size: 15px; font-weight: 600; color: #F0EDE6; }
+      .pillar-desc { font-size: 13px; color: rgba(240,237,230,0.45); margin-top: 4px; }
 
-	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
+      .about-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 36px 0; }
+      .pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: rgba(240,237,230,0.5); border: 1px solid rgba(240,237,230,0.12); padding: 5px 12px; border-radius: 20px; }
 
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
-	</p>
-</Layout>
+      .about-cta { margin-top: 56px; padding-top: 36px; border-top: 1px solid rgba(240,237,230,0.08); }
+      .btn-primary { background: #F5A623; color: #0A0F1E; border: none; padding: 14px 28px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 3px; text-decoration: none; display: inline-block; }
+
+      footer.site-footer { border-top: 1px solid rgba(240,237,230,0.07); padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
+      .footer-logo { font-family: 'DM Serif Display', serif; font-size: 15px; color: rgba(240,237,230,0.45); }
+      .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,237,230,0.18); }
+      .footer-links { display: flex; gap: 22px; }
+      .footer-links a { font-size: 12px; color: rgba(240,237,230,0.28); text-decoration: none; }
+      .footer-links a:hover { color: rgba(240,237,230,0.65); }
+
+      @media (max-width: 700px) {
+        nav { padding: 16px 20px; }
+        .nav-links { display: none; }
+        .about-wrap { padding: 48px 20px 60px; }
+        footer.site-footer { flex-direction: column; gap: 16px; text-align: center; padding: 28px 20px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="nav-logo" href="/">
+        <span class="nav-logo-main">The Economics of AI</span>
+        <span class="nav-logo-sub">Follow the money</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Analysis</a></li>
+        <li><a href="/blog">Archive</a></li>
+        <li><a href="/about" class="active">About</a></li>
+      </ul>
+      <a class="nav-subscribe" href="/#subscribe">Subscribe Free</a>
+    </nav>
+
+    <div class="about-wrap">
+      <p class="about-eyebrow">About this publication</p>
+      <h1 class="about-headline">Not news.<br />Not hype.<br /><em>Just the economics.</em></h1>
+
+      <p class="about-text">Most AI coverage focuses on model capabilities, product launches, and what happened last week. <strong>The Economics of AI</strong> goes one level deeper — into the capital flows, business models, and structural dynamics that actually determine who wins and who loses as this industry matures.</p>
+
+      <p class="about-text">Every piece is grounded in earnings data, capex disclosures, and public filings — not press releases or hype cycles. No stock tips, no affiliate links, no sponsored placements.</p>
+
+      <div class="pillars">
+        <div class="pillar">
+          <span class="pillar-num">01</span>
+          <div>
+            <div class="pillar-name">Capital Spending</div>
+            <div class="pillar-desc">Where hyperscalers deploy hundreds of billions, and what it means economically</div>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">02</span>
+          <div>
+            <div class="pillar-name">Business Models</div>
+            <div class="pillar-desc">Revenue mechanics, margin structure, and why well-funded startups still go bankrupt</div>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">03</span>
+          <div>
+            <div class="pillar-name">Winners &amp; Losers</div>
+            <div class="pillar-desc">Durable competitive advantages as model costs collapse and performance converges</div>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">04</span>
+          <div>
+            <div class="pillar-name">Supply Chain</div>
+            <div class="pillar-desc">Chips, cooling systems, power infrastructure, networking, and data center REITs</div>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">05</span>
+          <div>
+            <div class="pillar-name">Productivity Economy</div>
+            <div class="pillar-desc">How AI efficiency gains show up in GDP data, corporate earnings, and labor markets</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-pills">
+        <span class="pill">Earnings-grounded</span>
+        <span class="pill">No stock tips</span>
+        <span class="pill">No affiliate links</span>
+        <span class="pill">Independent</span>
+        <span class="pill">Long-form</span>
+      </div>
+
+      <div class="about-cta">
+        <a class="btn-primary" href="/blog">Browse all essays</a>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-logo">The Economics of AI</div>
+      <div class="footer-links">
+        <a href="/blog">Archive</a>
+        <a href="/about">About</a>
+        <a href="/rss.xml">RSS</a>
+      </div>
+      <div class="footer-copy">Independent analysis · Est. 2025</div>
+    </footer>
+  </body>
+</html>
