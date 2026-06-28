@@ -23,6 +23,12 @@ const categoryColors: Record<string, string> = {
   'Supply Chain': '#4CB87A',
   'Productivity Economy': '#E8893E',
 };
+
+const allPosts = await getCollection('blog');
+const relatedPosts = allPosts
+  .filter((p) => p.id !== post.id)
+  .sort(() => Math.random() - 0.5)
+  .slice(0, 3);
 ---
 
 <!doctype html>
@@ -37,12 +43,11 @@ const categoryColors: Record<string, string> = {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
-      * { box-sizing: border-box; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         background: #0A0F1E;
         color: #F0EDE6;
         font-family: 'Inter', sans-serif;
-        margin: 0;
         -webkit-font-smoothing: antialiased;
       }
       nav {
@@ -53,16 +58,17 @@ const categoryColors: Record<string, string> = {
       .nav-logo { display: flex; flex-direction: column; text-decoration: none; }
       .nav-logo-main { font-family: 'DM Serif Display', serif; font-size: 18px; color: #F0EDE6; line-height: 1; }
       .nav-logo-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #F5A623; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 3px; }
-      .nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+      .nav-links { display: flex; gap: 28px; list-style: none; }
       .nav-links a { color: rgba(240,237,230,0.5); text-decoration: none; font-size: 13px; font-weight: 500; }
       .nav-links a:hover { color: #F0EDE6; }
-      .nav-subscribe { background: #F5A623; color: #0A0F1E; border: none; padding: 9px 20px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 3px; text-decoration: none; }
-      .post-wrap { max-width: 760px; margin: 0 auto; padding: 64px 40px 100px; }
+      .nav-subscribe { background: #F5A623; color: #0A0F1E; padding: 9px 20px; font-size: 12px; font-weight: 600; border: none; border-radius: 3px; text-decoration: none; cursor: pointer; }
+
+      .post-wrap { max-width: 760px; margin: 0 auto; padding: 64px 40px 80px; }
       .back-link { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(240,237,230,0.4); text-decoration: none; margin-bottom: 32px; letter-spacing: 0.04em; }
       .back-link:hover { color: #F5A623; }
       .post-category { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 18px; font-weight: 500; }
       .post-title { font-family: 'DM Serif Display', serif; font-size: clamp(30px, 4.5vw, 46px); line-height: 1.12; letter-spacing: -0.02em; color: #F0EDE6; margin-bottom: 22px; }
-      .post-meta { display: flex; align-items: center; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(240,237,230,0.35); letter-spacing: 0.04em; margin-bottom: 44px; padding-bottom: 36px; border-bottom: 1px solid rgba(240,237,230,0.08); }
+      .post-meta { display: flex; align-items: center; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(240,237,230,0.35); margin-bottom: 44px; padding-bottom: 36px; border-bottom: 1px solid rgba(240,237,230,0.08); }
       .post-content { font-size: 17px; line-height: 1.8; color: rgba(240,237,230,0.82); }
       .post-content :global(h2) { font-family: 'DM Serif Display', serif; font-size: 28px; color: #F0EDE6; margin: 44px 0 18px; line-height: 1.25; }
       .post-content :global(h3) { font-family: 'DM Serif Display', serif; font-size: 22px; color: #F0EDE6; margin: 36px 0 14px; }
@@ -76,16 +82,37 @@ const categoryColors: Record<string, string> = {
       .post-content :global(code) { font-family: 'JetBrains Mono', monospace; background: rgba(240,237,230,0.08); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
       .post-content :global(pre) { background: #111827; border: 1px solid rgba(240,237,230,0.08); padding: 20px; border-radius: 4px; overflow-x: auto; margin: 28px 0; }
       .post-content :global(pre code) { background: none; padding: 0; }
+
+      /* RELATED POSTS */
+      .related-wrap { background: rgba(255,255,255,0.02); border-top: 1px solid rgba(240,237,230,0.08); padding: 60px 40px 80px; }
+      .related-inner { max-width: 1100px; margin: 0 auto; }
+      .related-header { display: flex; align-items: center; gap: 16px; margin-bottom: 40px; }
+      .related-line { flex: 1; height: 1px; background: rgba(240,237,230,0.08); }
+      .related-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(240,237,230,0.3); white-space: nowrap; }
+      .related-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+      .related-card { text-decoration: none; display: flex; flex-direction: column; background: rgba(240,237,230,0.03); border-radius: 8px; overflow: hidden; border: 1px solid rgba(240,237,230,0.07); transition: transform 0.2s, border-color 0.2s; }
+      .related-card:hover { transform: translateY(-3px); border-color: rgba(240,237,230,0.15); }
+      .related-card-top { height: 6px; width: 100%; }
+      .related-card-body { padding: 24px; display: flex; flex-direction: column; flex: 1; }
+      .related-card-category { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500; margin-bottom: 12px; }
+      .related-card-title { font-family: 'DM Serif Display', serif; font-size: 19px; color: #F0EDE6; line-height: 1.3; margin-bottom: 12px; flex: 1; }
+      .related-card-desc { font-size: 13px; color: rgba(240,237,230,0.4); line-height: 1.6; margin-bottom: 20px; }
+      .related-card-link { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(240,237,230,0.25); transition: color 0.2s; }
+      .related-card:hover .related-card-link { color: #F5A623; }
+
       footer.site-footer { border-top: 1px solid rgba(240,237,230,0.07); padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
       .footer-logo { font-family: 'DM Serif Display', serif; font-size: 15px; color: rgba(240,237,230,0.45); }
       .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(240,237,230,0.18); }
       .footer-links { display: flex; gap: 22px; }
       .footer-links a { font-size: 12px; color: rgba(240,237,230,0.28); text-decoration: none; }
       .footer-links a:hover { color: rgba(240,237,230,0.65); }
+
       @media (max-width: 700px) {
         nav { padding: 16px 20px; }
         .nav-links { display: none; }
         .post-wrap { padding: 40px 20px 60px; }
+        .related-wrap { padding: 40px 20px 60px; }
+        .related-grid { grid-template-columns: 1fr; }
         footer.site-footer { flex-direction: column; gap: 16px; text-align: center; padding: 28px 20px; }
       }
     </style>
@@ -103,6 +130,7 @@ const categoryColors: Record<string, string> = {
       </ul>
       <a class="nav-subscribe" href="/#subscribe">Subscribe Free</a>
     </nav>
+
     <article class="post-wrap">
       <a class="back-link" href="/blog">&larr; Back to all essays</a>
       <p class="post-category" style={`color:${categoryColors[post.data.category] ?? '#F5A623'}`}>{post.data.category}</p>
@@ -114,6 +142,30 @@ const categoryColors: Record<string, string> = {
         <Content />
       </div>
     </article>
+
+    <div class="related-wrap">
+      <div class="related-inner">
+        <div class="related-header">
+          <div class="related-line"></div>
+          <p class="related-label">Continue Reading</p>
+          <div class="related-line"></div>
+        </div>
+        <div class="related-grid">
+          {relatedPosts.map((p) => (
+            <a class="related-card" href={`/blog/${p.id}`}>
+              <div class="related-card-top" style={`background:${categoryColors[p.data.category] ?? '#F5A623'}`}></div>
+              <div class="related-card-body">
+                <p class="related-card-category" style={`color:${categoryColors[p.data.category] ?? '#F5A623'}`}>{p.data.category}</p>
+                <p class="related-card-title">{p.data.title}</p>
+                <p class="related-card-desc">{p.data.description}</p>
+                <p class="related-card-link">Read essay →</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
     <footer class="site-footer">
       <div class="footer-logo">The Economics of AI</div>
       <div class="footer-links">
